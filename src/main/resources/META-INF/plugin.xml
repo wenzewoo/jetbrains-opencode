@@ -5,7 +5,7 @@
     <description><![CDATA[
         Run OpenCode — a context-aware AI coding assistant CLI — directly inside IntelliJ IDEA's built-in terminal.
         <br>
-        <img src="example.png" alt="OpenCode Agent" width="800">
+        <img src="https://raw.githubusercontent.com/wenzewoo/jetbrains-opencode/refs/heads/main/src/main/resources/example.png" alt="OpenCode Agent" width="800">
         <br>
         <strong>Key Features:</strong>
         <ul>
