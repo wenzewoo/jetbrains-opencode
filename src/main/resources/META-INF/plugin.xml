@@ -4,7 +4,9 @@
     <vendor>wenzewoo</vendor>
     <description><![CDATA[
         Run OpenCode — a context-aware AI coding assistant CLI — directly inside IntelliJ IDEA's built-in terminal.
-        <br><br>
+        <br>
+        <img src="example.png" alt="OpenCode Agent" width="800">
+        <br>
         <strong>Key Features:</strong>
         <ul>
             <li>Terminal-based AI sessions — start, resume, fork, and browse OpenCode sessions in IDE terminal tabs</li>

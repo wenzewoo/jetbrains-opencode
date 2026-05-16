@@ -6,6 +6,8 @@ OpenCode Agent is an IntelliJ IDEA plugin that integrates [OpenCode](https://git
 
 Unlike traditional AI plugins that use custom UI widgets, OpenCode Agent runs OpenCode sessions inside the IDE's built-in terminal, giving you a familiar terminal-based AI coding experience with deep IDE integration.
 
+![OpenCode Agent](src/main/resources/example.png)
+
 ## Features
 
 - **Terminal-based AI Sessions** — Run, resume, fork, and browse OpenCode sessions in IDE terminal tabs
