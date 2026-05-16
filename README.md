@@ -1,10 +1,5 @@
 # OpenCode Agent
-
-[![Twitter Follow](https://img.shields.io/badge/follow-%40JBPlatform-1DA1F2?logo=twitter)](https://twitter.com/JBPlatform)
-
 OpenCode Agent is an IntelliJ IDEA plugin that integrates [OpenCode](https://github.com/anomalyco/opencode) — a context-aware AI coding assistant CLI — directly into your IDE.
-
-Unlike traditional AI plugins that use custom UI widgets, OpenCode Agent runs OpenCode sessions inside the IDE's built-in terminal, giving you a familiar terminal-based AI coding experience with deep IDE integration.
 
 ![OpenCode Agent](src/main/resources/example.png)
 

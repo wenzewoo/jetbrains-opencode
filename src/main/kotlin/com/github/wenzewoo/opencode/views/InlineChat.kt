@@ -3,6 +3,8 @@ package com.github.wenzewoo.opencode.views
 import com.github.wenzewoo.opencode.MessageBundle.message
 import com.github.wenzewoo.opencode.services.OpenCodeService
 import com.intellij.icons.AllIcons
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -35,7 +37,13 @@ object InlineChat {
 
         if (editor !is EditorEx) return
         val terminals = ToolWindowTabPicker.getTerminals(project)
-        if (terminals.isEmpty()) return
+        if (terminals.isEmpty()) {
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup(message("notification.group.opencode"))
+                .createNotification(message("notification.noTerminals"), NotificationType.WARNING)
+                .notify(project)
+            return
+        }
 
         val arc = JBUI.scale(12)
         val arrow = JBUI.scale(16)
