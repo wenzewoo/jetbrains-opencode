@@ -1,0 +1,66 @@
+<idea-plugin>
+    <id>com.github.wenzewoo.jetbrains-opencode</id>
+    <name>OpenCode Agent</name>
+    <vendor>wenzewoo</vendor>
+    <description><![CDATA[
+        Run OpenCode — a context-aware AI coding assistant CLI — directly inside IntelliJ IDEA's built-in terminal.
+        <br><br>
+        <strong>Key Features:</strong>
+        <ul>
+            <li>Terminal-based AI sessions — start, resume, fork, and browse OpenCode sessions in IDE terminal tabs</li>
+            <li>Inline chat — open a lightweight popup from the editor (<em>Alt+Enter</em> or right-click) to send prompts with automatic file references</li>
+            <li>File references — send file paths with line numbers from the project view or editor context menu</li>
+            <li>Real-time VFS sync — AI file edits automatically refresh the IDE virtual file system via SSE events</li>
+            <li>Permission notifications — alerts when OpenCode requests file access or command execution</li>
+            <li>Multi-session management — run multiple parallel OpenCode sessions, each in its own terminal tab</li>
+        </ul>
+        <br>
+        Requires the <a href="https://github.com/anomalyco/opencode">OpenCode CLI</a> to be installed separately.
+        ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
+
+    <resource-bundle>messages.MessageBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="OpenCode Agent" factoryClass="com.github.wenzewoo.opencode.views.ToolWindowFactory"
+                    anchor="right" icon="/icons/opencode.svg"/>
+        <applicationConfigurable instance="com.github.wenzewoo.opencode.settings.OpenCodeConfigurable"
+                                 id="com.github.wenzewoo.settings"
+                                 parentId="tools"
+                                 displayName="OpenCode Agent"/>
+        <applicationService serviceImplementation="com.github.wenzewoo.opencode.settings.OpenCodeSettings"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="OpenCode" displayType="BALLOON" bundle="messages.MessageBundle"
+                           key="notification.group.opencode"/>
+        <intentionAction>
+            <className>com.github.wenzewoo.opencode.actions.InlineChatIntentionAction</className>
+            <category>OpenCode</category>
+        </intentionAction>
+        <intentionAction>
+            <className>com.github.wenzewoo.opencode.actions.SendFileRefIntentionAction</className>
+            <category>OpenCode</category>
+        </intentionAction>
+    </extensions>
+
+    <actions>
+        <action id="OpenCode.SendFileRef"
+                class="com.github.wenzewoo.opencode.actions.SendFileRefAction"
+        >
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+        <action id="OpenCode.EditorSendFileRef"
+                class="com.github.wenzewoo.opencode.actions.EditorSendFileRefAction">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"
+                          relative-to-action="Paste"/>
+        </action>
+        <action id="OpenCode.EditorInlineChat"
+                class="com.github.wenzewoo.opencode.actions.EditorInlineChatAction">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"
+                          relative-to-action="OpenCode.EditorSendFileRef"/>
+        </action>
+    </actions>
+</idea-plugin>
