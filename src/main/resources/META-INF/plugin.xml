@@ -4,6 +4,7 @@
     <vendor>wenzewoo</vendor>
     <description><![CDATA[
         Run OpenCode  — directly inside IntelliJ IDEA's built-in terminal.
+        <br/>
         <strong>Features:</strong>
         <ul>
             <li>Terminal-based AI sessions — start, resume, fork, and browse OpenCode sessions in IDE terminal tabs</li>
@@ -23,13 +24,12 @@
     <resource-bundle>messages.MessageBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="OpenCode Agent" factoryClass="com.github.wenzewoo.opencode.views.ToolWindowFactory"
-                    anchor="right" icon="/icons/opencode.svg"/>
         <applicationConfigurable instance="com.github.wenzewoo.opencode.settings.OpenCodeConfigurable"
                                  id="com.github.wenzewoo.settings"
                                  parentId="tools"
                                  displayName="OpenCode Agent"/>
         <applicationService serviceImplementation="com.github.wenzewoo.opencode.settings.OpenCodeSettings"/>
+        <postStartupActivity implementation="com.github.wenzewoo.opencode.views.ToolWindowRegistrar"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
