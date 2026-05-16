@@ -76,7 +76,7 @@ class EventHandler(private val project: Project, private val widgetContent: Cont
     }
 
     fun notifyConnectionEstablished() {
-        notify(NotificationType.INFORMATION, message("notification.sse.connected"))
+        //notify(NotificationType.INFORMATION, message("notification.sse.connected"))
     }
 
     private fun notify(type: NotificationType, content: String) {

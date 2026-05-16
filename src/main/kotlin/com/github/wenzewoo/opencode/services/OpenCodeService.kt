@@ -39,16 +39,17 @@ object OpenCodeService {
         val binary = OpenCodeLauncher.resolveBinaryPath()
         val cmd = listOf(binary, "session", "list", "--format", "json", "-n", limit.toString())
         return try {
-            val proc = ProcessBuilder(cmd)
+            val proc = OpenCodeLauncher.createProcessBuilder(cmd)
                 .directory(if (workingDir != null) File(workingDir) else null)
-                .redirectErrorStream(true)
                 .start()
-            val reader = BufferedReader(InputStreamReader(proc.inputStream))
-            val output = reader.readText()
+            val output = proc.inputStream.bufferedReader().readText()
             proc.waitFor(10, TimeUnit.SECONDS)
 
             val trimmed = output.trim()
-            if (!trimmed.startsWith("[")) return emptyList()
+            if (!trimmed.startsWith("[")) {
+                logger.warn("fetchSessions: unexpected output prefix: ${trimmed.take(80)}")
+                return emptyList()
+            }
             return try {
                 Json.decodeFromString<List<SessionInfo>>(trimmed)
             } catch (ex: Exception) {

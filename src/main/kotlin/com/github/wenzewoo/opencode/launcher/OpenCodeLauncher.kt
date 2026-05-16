@@ -14,18 +14,29 @@ sealed class SessionMode {
 
 object OpenCodeLauncher {
 
+    private val isWin by lazy { System.getProperty("os.name").lowercase().contains("win") }
+    private val binaryName by lazy { if (isWin) "opencode.exe" else "opencode" }
+
+    private val shellPath by lazy {
+        val shell = System.getenv("SHELL") ?: "/bin/zsh"
+        runQuietly {
+            val proc = ProcessBuilder(shell, "-l", "-c", "echo \$PATH")
+                .redirectErrorStream(true).start()
+            val result = proc.inputStream.bufferedReader().readLine()?.trim()
+            proc.waitFor(5, TimeUnit.SECONDS)
+            result
+        }?.ifBlank { null }
+    }
+
     fun resolveBinaryPath(): String {
         val settings = OpenCodeSettings.getInstance()
         val settingsPath = settings.state.cliPath.trim()
         if (settingsPath.isNotEmpty() && File(settingsPath).canExecute()) return settingsPath
 
+        val resolved = resolveFromShell()
+        if (resolved != null && File(resolved).canExecute()) return resolved
 
-        val resolved = resolveAbsolutePath()
-        val resolvedFile = File(resolved)
-        if (resolvedFile.exists() && resolvedFile.canExecute()) {
-            return resolvedFile.absolutePath
-        }
-        return "opencode"
+        throw IllegalStateException("opencode binary not found. Please configure the path in Settings → Tools → OpenCode Agent")
     }
 
     fun buildLaunchCommand(sessionMode: SessionMode = SessionMode.Continue): List<String> {
@@ -41,6 +52,16 @@ object OpenCodeLauncher {
         return args
     }
 
+    fun createProcessBuilder(cmd: List<String>): ProcessBuilder {
+        val pb = ProcessBuilder(cmd)
+        val path = shellPath
+        if (path != null) {
+            val current = pb.environment()["PATH"] ?: System.getenv("PATH") ?: ""
+            pb.environment()["PATH"] = "$path:$current"
+        }
+        return pb
+    }
+
     private fun findRandomPort(): Int = try {
         ServerSocket(0).use { it.localPort }
     } catch (_: Exception) {
@@ -50,16 +71,14 @@ object OpenCodeLauncher {
     private inline fun <T> runQuietly(block: () -> T): T? =
         try { block() } catch (_: Throwable) { null }
 
-    private fun resolveAbsolutePath(): String {
-        val binary = "opencode"
-        if (File(binary).isAbsolute) return binary
-        val isWin = System.getProperty("os.name").lowercase().contains("win")
-        val cmd = if (isWin) listOf("where", binary) else listOf("which", binary)
+    private fun resolveFromShell(): String? {
+        val shell = System.getenv("SHELL") ?: "/bin/zsh"
+        val cmd = if (isWin) listOf("where", binaryName) else listOf(shell, "-l", "-c", "which $binaryName")
         return runQuietly {
-            val proc = ProcessBuilder(cmd).redirectErrorStream(true).start()
+            val proc = createProcessBuilder(cmd).redirectErrorStream(true).start()
             val result = proc.inputStream.bufferedReader().readLine()?.trim()
             proc.waitFor(5, TimeUnit.SECONDS)
-            if (!result.isNullOrEmpty() && File(result).exists()) result else binary
-        } ?: binary
+            if (!result.isNullOrEmpty() && File(result).canExecute()) result else null
+        }
     }
 }
