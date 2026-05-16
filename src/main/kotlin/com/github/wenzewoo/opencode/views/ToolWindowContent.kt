@@ -7,11 +7,8 @@ import com.github.wenzewoo.opencode.events.EventHandler
 import com.github.wenzewoo.opencode.events.EventStreamListener
 import com.github.wenzewoo.opencode.services.OpenCodeService
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CustomShortcutSet
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
@@ -21,15 +18,10 @@ import org.jetbrains.plugins.terminal.ShellStartupOptions
 import org.jetbrains.plugins.terminal.ShellTerminalWidget
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager
 import java.awt.BorderLayout
-import java.awt.KeyEventDispatcher
-import java.awt.KeyboardFocusManager
-import java.awt.event.KeyEvent
 import java.io.File
 import java.util.WeakHashMap
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.KeyStroke
-import javax.swing.SwingUtilities
 import kotlin.text.iterator
 
 class ToolWindowContent(
@@ -112,33 +104,6 @@ class ToolWindowContent(
         listener.start()
         Disposer.register(parentDisposable) { listener.stop() }
 
-        object : DumbAwareAction() {
-            override fun actionPerformed(e: AnActionEvent) {
-                terminalWidget.ttyConnector?.let { connector ->
-                    runQuietly { connector.write("\u001B") }
-                }
-            }
-        }.registerCustomShortcutSet(
-            CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
-            terminalWidget.component,
-            parentDisposable
-        )
-
-        val escapeDispatcher = KeyEventDispatcher { event ->
-            if (event.keyCode != KeyEvent.VK_ESCAPE || event.id != KeyEvent.KEY_PRESSED) return@KeyEventDispatcher false
-            val focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().focusOwner ?: return@KeyEventDispatcher false
-            if (!SwingUtilities.isDescendingFrom(focusOwner, terminalWidget.component)) return@KeyEventDispatcher false
-            terminalWidget.ttyConnector?.let { connector ->
-                runQuietly { connector.write("\u001B") }
-                event.consume()
-                return@KeyEventDispatcher true
-            }
-            false
-        }
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(escapeDispatcher)
-        Disposer.register(parentDisposable) {
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(escapeDispatcher)
-        }
 
         Disposer.register(parentDisposable) {
             widgets.remove(project)
