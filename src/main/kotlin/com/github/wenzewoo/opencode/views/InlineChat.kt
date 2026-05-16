@@ -39,6 +39,7 @@ object InlineChat {
 
         val arc = JBUI.scale(12)
         val arrow = JBUI.scale(16)
+        val arrowH = (arrow.toDouble() * Math.sqrt(3.0) / 2).toInt()
         val bgColor = UIUtil.getTextFieldBackground()
         val borderColor = com.intellij.ui.JBColor.border()
 
@@ -72,22 +73,22 @@ object InlineChat {
                 val y = ins.top
                 val w = width - ins.left - ins.right - 1
                 val h = height - ins.top - ins.bottom - 1
-                val ax = x - arrow
-                val arrowTipY = y + arrow
+                val arrowX = x + arc
+                val arrowTipY = y - arrowH
 
                 g2.color = borderColor
                 g2.fillRoundRect(x, y, w, h, arc, arc)
-                g2.fillPolygon(intArrayOf(ax, x, x + arrow), intArrayOf(arrowTipY, arrowTipY - arrow / 2, arrowTipY), 3)
+                g2.fillPolygon(intArrayOf(arrowX - arrow / 2, arrowX + arrow / 2, arrowX), intArrayOf(y, y, arrowTipY), 3)
                 g2.color = bgColor
                 g2.fillRoundRect(x + 1, y + 1, w - 2, h - 2, arc - 1, arc - 1)
-                g2.fillPolygon(intArrayOf(ax + 1, x + 1, x + arrow), intArrayOf(arrowTipY, arrowTipY - arrow / 2 + 1, arrowTipY), 3)
+                g2.fillPolygon(intArrayOf(arrowX - arrow / 2 + 1, arrowX + arrow / 2 - 1, arrowX), intArrayOf(y + 1, y + 1, arrowTipY + 1), 3)
                 super.paintComponent(g)
             }
         }
         panel.add(editorTextField, BorderLayout.CENTER)
         panel.add(toolbar, BorderLayout.SOUTH)
         panel.background = bgColor
-        panel.border = JBUI.Borders.empty(8, arrow + 8, 8, 8)
+        panel.border = JBUI.Borders.empty(arrowH + 8, 8, 8, 8)
         panel.isOpaque = false
 
         val offset = editor.caretModel.primaryCaret.offset
@@ -115,19 +116,17 @@ object InlineChat {
         fun performSend() {
             val text = editorTextField.text.trim()
             if (text.isEmpty()) return
-            val term = if (terminals.size == 1) terminals.first()
-            else {
-                var chosen: ToolWindowTabPicker.TermInfo? = null
-                ToolWindowTabPicker.showPicker(project, terminals) { chosen = it }
-                chosen ?: return
-            }
-            OpenCodeService.sendPrompt(term.port, "$text ") { ok ->
-                if (ok) {
-                    inlay.dispose()
-                    activeDisposable = null
-                    ToolWindowTabPicker.navigateToTerminal(project, term.port)
+            val send: (ToolWindowTabPicker.TermInfo) -> Unit = { term ->
+                OpenCodeService.sendPrompt(term.port, "$text ") { ok ->
+                    if (ok) {
+                        inlay.dispose()
+                        activeDisposable = null
+                        ToolWindowTabPicker.navigateToTerminal(project, term.port)
+                    }
                 }
             }
+            if (terminals.size == 1) send(terminals.first())
+            else ToolWindowTabPicker.showPicker(project, terminals, send)
         }
 
         sendButton.addActionListener { performSend() }
