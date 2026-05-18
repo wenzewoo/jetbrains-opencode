@@ -22,8 +22,8 @@ fun setupToolWindowContent(project: Project, toolWindow: ToolWindow) {
     val typeName = OpenCodeSettings.getInstance().state.toolWindowType
     val targetType = try { ToolWindowType.valueOf(typeName) } catch (_: Exception) { ToolWindowType.FLOATING }
     toolWindow.setType(targetType) {}
-    toolWindow.setTitle(MessageBundle.message("toolWindow.title"))
-    toolWindow.setStripeTitle(MessageBundle.message("toolWindow.title"))
+    toolWindow.title = MessageBundle.message("toolWindow.title")
+    toolWindow.stripeTitle = MessageBundle.message("toolWindow.title")
     val cm = toolWindow.contentManager
 
     val addTabAction = object : DumbAwareAction(
@@ -85,44 +85,44 @@ fun setupToolWindowContent(project: Project, toolWindow: ToolWindow) {
             else popup.showInBestPositionFor(e.dataContext)
         }
     }
-
-    val closeTabAction = object : DumbAwareAction(
-        MessageBundle.message("action.closeTab.text"),
-        MessageBundle.message("action.closeTab.description"), AllIcons.Actions.Cancel
-    ) {
-        override fun getActionUpdateThread() = ActionUpdateThread.BGT
-        override fun actionPerformed(e: AnActionEvent) {
-            val group = DefaultActionGroup(
-                object : DumbAwareAction(
-                    MessageBundle.message("action.closeTab.text"),
-                    MessageBundle.message("action.closeTab.description"), AllIcons.Actions.Cancel
-                ) {
-                    override fun actionPerformed(e: AnActionEvent) {
-                        val selected = cm.selectedContent ?: return
-                        val panel = selected.component
-                        if (panel is JPanel) ToolWindowContent.cleanupTab(panel)
-                        cm.removeContent(selected, true)
-                    }
-                }
-            )
-            val popup = JBPopupFactory.getInstance()
-                .createActionGroupPopup(null, group, e.dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, true)
-            val invoker = e.inputEvent?.component
-            if (invoker != null) popup.showUnderneathOf(invoker)
-            else popup.showInBestPositionFor(e.dataContext)
-        }
-    }
+// For idea 2026.x, No longer needed
+//    val closeTabAction = object : DumbAwareAction(
+//        MessageBundle.message("action.closeTab.text"),
+//        MessageBundle.message("action.closeTab.description"), AllIcons.Actions.Cancel
+//    ) {
+//        override fun getActionUpdateThread() = ActionUpdateThread.BGT
+//        override fun actionPerformed(e: AnActionEvent) {
+//            val group = DefaultActionGroup(
+//                object : DumbAwareAction(
+//                    MessageBundle.message("action.closeTab.text"),
+//                    MessageBundle.message("action.closeTab.description"), AllIcons.Actions.Cancel
+//                ) {
+//                    override fun actionPerformed(e: AnActionEvent) {
+//                        val selected = cm.selectedContent ?: return
+//                        val panel = selected.component
+//                        if (panel is JPanel) ToolWindowContent.cleanupTab(panel)
+//                        cm.removeContent(selected, true)
+//                    }
+//                }
+//            )
+//            val popup = JBPopupFactory.getInstance()
+//                .createActionGroupPopup(null, group, e.dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, true)
+//            val invoker = e.inputEvent?.component
+//            if (invoker != null) popup.showUnderneathOf(invoker)
+//            else popup.showInBestPositionFor(e.dataContext)
+//        }
+//    }
 
     cm.addContentManagerListener(object : ContentManagerListener {
         override fun contentRemoved(event: ContentManagerEvent) {
             val panel = event.content.component
             if (panel is JPanel) ToolWindowContent.cleanupTab(panel)
-            if (cm.contentCount == 0) toolWindow.hide()
+             if (cm.contentCount == 0) toolWindow.show() // always show.
         }
     })
 
     toolWindow.setTitleActions(listOf(
-        addTabAction, closeTabAction
+        addTabAction//, closeTabAction
     ))
 
     addSessionTab(project, toolWindow, SessionMode.Continue)

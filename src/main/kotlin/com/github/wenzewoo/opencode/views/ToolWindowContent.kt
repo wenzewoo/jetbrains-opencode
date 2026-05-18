@@ -147,13 +147,6 @@ class ToolWindowContent(
         }
     }
 
-    private fun isUsableBinary(binary: String, resolvedBinary: String): Boolean {
-        val resolvedFile = File(resolvedBinary)
-        if (resolvedFile.isAbsolute) return resolvedFile.exists() && resolvedFile.canExecute()
-        val rawFile = File(binary)
-        return rawFile.isAbsolute && rawFile.exists() && rawFile.canExecute()
-    }
-
     private fun List<String>.toShellCommand(): String = joinToString(" ") { it.shellQuote() }
 
     private fun String.shellQuote(): String {
@@ -170,20 +163,6 @@ class ToolWindowContent(
             } else {
                 this
             }
-        }
-    }
-
-    private fun escapeHtml(value: String): String = buildString(value.length) {
-        for (ch in value) {
-            append(
-                when (ch) {
-                    '<' -> "&lt;"
-                    '>' -> "&gt;"
-                    '&' -> "&amp;"
-                    '"' -> "&quot;"
-                    else -> ch
-                }
-            )
         }
     }
 

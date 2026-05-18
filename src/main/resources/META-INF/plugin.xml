@@ -27,7 +27,7 @@
         <applicationConfigurable instance="com.github.wenzewoo.opencode.settings.OpenCodeConfigurable"
                                  id="com.github.wenzewoo.settings"
                                  parentId="tools"
-                                 displayName="OpenCode Agent"/>
+                                 displayName="OpenCode"/>
         <applicationService serviceImplementation="com.github.wenzewoo.opencode.settings.OpenCodeSettings"/>
         <postStartupActivity implementation="com.github.wenzewoo.opencode.views.ToolWindowRegistrar"/>
     </extensions>

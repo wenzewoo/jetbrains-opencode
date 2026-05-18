@@ -86,7 +86,7 @@ class EventHandler(private val project: Project, private val widgetContent: Cont
 
             notification.addAction(NotificationAction.createSimple(message("notification.navigateToTerminal")) {
                 val toolWindow =
-                    ToolWindowManager.getInstance(project).getToolWindow("OpenCode Agent") ?: return@createSimple
+                    ToolWindowManager.getInstance(project).getToolWindow("OpenCode") ?: return@createSimple
                 toolWindow.activate(
                     Runnable { toolWindow.contentManager.setSelectedContent(widgetContent) }, true, true
                 )

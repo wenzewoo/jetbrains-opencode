@@ -22,7 +22,7 @@ object ToolWindowTabPicker {
     }
 
     fun getTerminals(project: Project): List<TermInfo> {
-        val tw = ToolWindowManager.getInstance(project).getToolWindow("OpenCode Agent") ?: return emptyList()
+        val tw = ToolWindowManager.getInstance(project).getToolWindow("OpenCode") ?: return emptyList()
         return tw.contentManager.contents.mapNotNull { content ->
             val port = content.getUserData(ToolWindowContent.OPENCODE_PORT_KEY)
             if (port != null) TermInfo(port, content.displayName?.ifEmpty { message("terminal.picker.defaultTitle", port) } ?: message("terminal.picker.defaultTitle", port))
@@ -31,7 +31,7 @@ object ToolWindowTabPicker {
     }
 
     fun navigateToTerminal(project: Project, port: Int) {
-        val tw = ToolWindowManager.getInstance(project).getToolWindow("OpenCode Agent") ?: return
+        val tw = ToolWindowManager.getInstance(project).getToolWindow("OpenCode") ?: return
         val content = tw.contentManager.contents.find { it.getUserData(ToolWindowContent.OPENCODE_PORT_KEY) == port } ?: return
         tw.activate(Runnable { tw.contentManager.setSelectedContent(content) }, true, true)
     }

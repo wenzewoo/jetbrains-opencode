@@ -36,7 +36,7 @@ object OpenCodeLauncher {
         val resolved = resolveFromShell()
         if (resolved != null && File(resolved).canExecute()) return resolved
 
-        throw IllegalStateException("opencode binary not found. Please configure the path in Settings → Tools → OpenCode Agent")
+        throw IllegalStateException("opencode binary not found. Please configure the path in Settings → Tools → OpenCode")
     }
 
     fun buildLaunchCommand(sessionMode: SessionMode = SessionMode.Continue): List<String> {

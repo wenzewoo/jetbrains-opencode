@@ -14,9 +14,9 @@ class ToolWindowRegistrar : StartupActivity.DumbAware {
         ApplicationManager.getApplication().invokeLater {
             if (project.isDisposed) return@invokeLater
             val twm = ToolWindowManager.getInstance(project)
-            if (twm.getToolWindow("OpenCode Agent") != null) return@invokeLater
+            if (twm.getToolWindow("OpenCode") != null) return@invokeLater
 
-            twm.registerToolWindow("OpenCode Agent") {
+            twm.registerToolWindow("OpenCode") {
                 anchor = ToolWindowAnchor.RIGHT
                 icon = IconLoader.getIcon("/icons/opencode.svg", ToolWindowRegistrar::class.java)
             }
@@ -26,7 +26,7 @@ class ToolWindowRegistrar : StartupActivity.DumbAware {
                 ToolWindowManagerListener.TOPIC,
                 object : ToolWindowManagerListener {
                     override fun toolWindowShown(toolWindow: ToolWindow) {
-                        if (toolWindow.id == "OpenCode Agent" && !initialized) {
+                        if (toolWindow.id == "OpenCode" && !initialized) {
                             initialized = true
                             setupToolWindowContent(project, toolWindow)
                         }
